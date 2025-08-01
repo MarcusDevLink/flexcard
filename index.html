@@ -1,0 +1,1487 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlexCard - Estude com Flashcards</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4ade80;
+            --warning-color: #facc15;
+            --danger-color: #ef4444;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--dark-color);
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .main-container {
+            padding: 2rem 0;
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            height: fit-content;
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar-title {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .subject-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .subject-item {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            position: relative;
+        }
+        
+        .subject-item:hover {
+            background: #e9ecef;
+            border-left-color: var(--primary-color);
+        }
+        
+        .subject-item.active {
+            background: #e3edff;
+            border-left-color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .delete-subject {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--danger-color);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .subject-item:hover .delete-subject {
+            opacity: 1;
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        
+        .search-box input {
+            padding-left: 30px;
+            border-radius: 20px;
+        }
+        
+        .badge-status {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+        }
+        
+        .topics-container {
+            display: none;
+            margin-bottom: 2rem;
+        }
+        
+        .topics-header {
+            background: white;
+            border-radius: 15px 15px 0 0;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .topics-header h5 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+        
+        .back-button {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .topics-list {
+            background: white;
+            border-radius: 0 0 15px 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .topic-item {
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            position: relative;
+        }
+        
+        .topic-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .topic-item.active {
+            background: #e3edff;
+            border-left-color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .delete-topic {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--danger-color);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .topic-item:hover .delete-topic {
+            opacity: 1;
+        }
+        
+        .topic-title {
+            font-weight: 600;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .topic-icon {
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+        }
+        
+        .flashcard-container {
+            display: none;
+            margin-top: 2rem;
+        }
+        
+        .flashcard {
+            perspective: 1000px;
+            height: 300px;
+            margin: 0 auto;
+        }
+        
+        .flip-card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+        
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .flip-card-front {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem;
+        }
+        
+        .flip-card-back {
+            background: white;
+            color: var(--dark-color);
+            transform: rotateY(180deg);
+            padding: 1.5rem;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .card-icon {
+            font-size: 1.5rem;
+            opacity: 0.8;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+        
+        .card-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+        
+        .action-hint {
+            margin-top: auto;
+            text-align: center;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+        
+        .btn-nav {
+            background: white;
+            border: 1px solid #dee2e6;
+            color: var(--primary-color);
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-nav:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-nav:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+        }
+        
+        .modal-header {
+            background: var(--primary-color);
+            color: white;
+            border-radius: 15px 15px 0 0;
+            padding: 1rem 1.5rem;
+        }
+        
+        .modal-title {
+            font-weight: 600;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .form-floating {
+            margin-bottom: 1rem;
+        }
+        
+        .form-control {
+            border-radius: 10px;
+        }
+        
+        .btn-create {
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-create:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        .btn-add-topic {
+            background: var(--accent-color);
+            border: none;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+        
+        .btn-add-topic:hover {
+            background: #3ca5c7;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76, 201, 240, 0.4);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6c757d;
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+        
+        .empty-state-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+        
+        .empty-state-text {
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .shuffle-icon {
+            margin-right: 0.5rem;
+        }
+        
+        .sync-icon {
+            margin-right: 0.5rem;
+        }
+        
+        .delete-flashcard {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: none;
+            border: none;
+            color: var(--danger-color);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .flip-card:hover .delete-flashcard {
+            opacity: 1;
+        }
+        
+        /* Confirmation dialog styles */
+        .confirmation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .confirmation-dialog {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .confirmation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .confirmation-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--danger-color);
+        }
+        
+        .confirmation-body {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .confirmation-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+        
+        .btn-confirm {
+            background: var(--danger-color);
+            border: none;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+        }
+        
+        .btn-cancel {
+            background: #6c757d;
+            border: none;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+        }
+        
+        @media (max-width: 640px) {
+            .flashcard {
+                height: 250px;
+            }
+            
+            .card-content {
+                font-size: 1rem;
+                padding: 0 1rem;
+            }
+            
+            .topics-container {
+                margin-bottom: 1.5rem;
+            }
+            
+            .topics-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .navigation-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .btn-nav {
+                width: 100%;
+                text-align: center;
+            }
+        }
+        
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .flashcard {
+                height: 280px;
+            }
+            
+            .card-content {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .flashcard {
+                height: 300px;
+            }
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c0c0c0;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0a0a0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="fas fa-cube me-2" style="color: var(--primary-color);"></i>
+                <span class="fw-bold" style="color: var(--primary-color);">FlexCard</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-home"></i> Início</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-chart-line"></i> Progresso</a>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link btn btn-link p-0" id="syncDataBtn">
+                            <i class="fas fa-sync-alt sync-icon"></i> Sincronizar
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-container">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="sidebar">
+                    <h5 class="sidebar-title">
+                        <i class="fas fa-book me-2"></i>
+                        Matérias
+                    </h5>
+                    
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" placeholder="Buscar matéria..." id="searchSubject" disabled>
+                    </div>
+                    
+                    <ul class="subject-list" id="subjectList">
+                        <!-- No subjects initially -->
+                    </ul>
+                    
+                    <button class="btn btn-outline-primary w-100 mt-3" id="addSubjectBtn">
+                        <i class="fas fa-plus"></i> Adicionar Matéria
+                    </button>
+                    
+                    <div class="empty-state" id="emptyState">
+                        <i class="fas fa-graduation-cap empty-state-icon"></i>
+                        <h5 class="empty-state-title">Nenhuma matéria criada</h5>
+                        <p class="empty-state-text">Comece adicionando sua primeira matéria para organizar seus estudos com flashcards.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-8">
+                <!-- Topics Container -->
+                <div class="topics-container" id="topicsContainer">
+                    <div class="topics-header">
+                        <h5 id="topicsHeaderTitle">Tópicos de <span id="subjectTitle">Matemática</span></h5>
+                        <button class="back-button" id="backToSubjects">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </button>
+                    </div>
+                    <div class="topics-list" id="topicsList">
+                        <!-- Topics will be populated here -->
+                    </div>
+                    <button class="btn-add-topic" id="addTopicBtn">
+                        <i class="fas fa-plus"></i> Adicionar Tópico
+                    </button>
+                </div>
+                
+                <!-- Flashcard Container -->
+                <div class="flashcard-container" id="flashcardContainer">
+                    <div class="flashcard">
+                        <div class="flip-card" id="flipCard">
+                            <button class="delete-flashcard" id="deleteFlashcardBtn">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                            <div class="flip-card-front">
+                                <div class="card-header">
+                                    <span class="card-icon">
+                                        <i class="fas fa-question-circle"></i>
+                                    </span>
+                                    <span class="card-title" id="flashcardSubject">Matemática</span>
+                                </div>
+                                <div class="card-content" id="questionText">
+                                    Qual é a fórmula para calcular a área de um círculo?
+                                </div>
+                                <div class="action-hint">
+                                    <i class="fas fa-hand-point-up me-1"></i>
+                                    Clique para ver a resposta
+                                </div>
+                            </div>
+                            
+                            <div class="flip-card-back">
+                                <div class="card-header">
+                                    <span class="card-icon">
+                                        <i class="fas fa-check-circle"></i>
+                                    </span>
+                                    <span class="card-title" id="flashcardTopic">Geometria</span>
+                                </div>
+                                <div class="card-content" id="answerText">
+                                    A fórmula para calcular a área de um círculo é A = πr², onde r é o raio do círculo.
+                                </div>
+                                <div class="action-hint">
+                                    <i class="fas fa-hand-point-down me-1"></i>
+                                    Clique para ver a pergunta novamente
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation-buttons">
+                        <button class="btn-nav" id="prevCard">
+                            <i class="fas fa-chevron-left me-2"></i> Anterior
+                        </button>
+                        <button class="btn-nav" id="nextCard">
+                            Próximo <i class="fas fa-chevron-right ms-2"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="text-center mt-3">
+                        <button class="btn btn-outline-primary" id="shuffleCardsBtn">
+                            <i class="fas fa-random shuffle-icon"></i> Embaralhar Flashcards
+                        </button>
+                        <button class="btn btn-outline-primary mt-2" id="addFlashcardBtn">
+                            <i class="fas fa-plus"></i> Adicionar Flashcard
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Subject Modal -->
+    <div class="modal fade" id="addSubjectModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Adicionar Nova Matéria</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="subjectName" placeholder="Nome da matéria">
+                        <label for="subjectName">Nome da Matéria</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-create" id="saveSubjectBtn">Adicionar Matéria</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Topic Modal -->
+    <div class="modal fade" id="addTopicModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Adicionar Novo Tópico</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="topicName" placeholder="Nome do tópico">
+                        <label for="topicName">Nome do Tópico</label>
+                    </div>
+                    <div class="form-floating">
+                        <select class="form-control" id="topicIcon">
+                            <option value="ruler-combined">Geometria</option>
+                            <option value="square-root-alt">Álgebra</option>
+                            <option value="triangle">Trigonometria</option>
+                            <option value="car-side">Mecânica</option>
+                            <option value="bolt">Eletricidade</option>
+                            <option value="flask">Química</option>
+                            <option value="dna">Genética</option>
+                            <option value="industry">História</option>
+                            <option value="cloud-sun">Climatologia</option>
+                            <option value="book">Geral</option>
+                        </select>
+                        <label for="topicIcon">Ícone</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-create" id="saveTopicBtn">Adicionar Tópico</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Flashcard Modal -->
+    <div class="modal fade" id="addFlashcardModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Adicionar Novo Flashcard</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-floating mb-3">
+                        <textarea class="form-control" id="flashcardQuestion" placeholder="Pergunta" style="height: 100px"></textarea>
+                        <label for="flashcardQuestion">Pergunta</label>
+                    </div>
+                    <div class="form-floating">
+                        <textarea class="form-control" id="flashcardAnswer" placeholder="Resposta" style="height: 100px"></textarea>
+                        <label for="flashcardAnswer">Resposta</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-create" id="saveFlashcardBtn">Adicionar Flashcard</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Dialog -->
+    <div class="confirmation-overlay" id="confirmationOverlay">
+        <div class="confirmation-dialog">
+            <div class="confirmation-header">
+                <h5 class="confirmation-title"><i class="fas fa-exclamation-triangle me-2"></i> Confirmar Exclusão</h5>
+                <button class="btn-close" id="cancelDeleteBtn"></button>
+            </div>
+            <div class="confirmation-body" id="confirmationMessage">
+                Tem certeza que deseja excluir este item? Esta ação não pode ser desfeita.
+            </div>
+            <div class="confirmation-footer">
+                <button class="btn-cancel" id="confirmCancelBtn">Cancelar</button>
+                <button class="btn-confirm" id="confirmDeleteBtn">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const subjectList = document.getElementById('subjectList');
+            const topicsContainer = document.getElementById('topicsContainer');
+            const topicsList = document.getElementById('topicsList');
+            const topicsHeaderTitle = document.getElementById('topicsHeaderTitle');
+            const subjectTitleSpan = document.getElementById('subjectTitle');
+            const flashcardContainer = document.getElementById('flashcardContainer');
+            const flipCard = document.getElementById('flipCard');
+            const questionText = document.getElementById('questionText');
+            const answerText = document.getElementById('answerText');
+            const flashcardSubject = document.getElementById('flashcardSubject');
+            const flashcardTopic = document.getElementById('flashcardTopic');
+            const prevCardBtn = document.getElementById('prevCard');
+            const nextCardBtn = document.getElementById('nextCard');
+            const addFlashcardBtn = document.getElementById('addFlashcardBtn');
+            const deleteFlashcardBtn = document.getElementById('deleteFlashcardBtn');
+            const shuffleCardsBtn = document.getElementById('shuffleCardsBtn');
+            const syncDataBtn = document.getElementById('syncDataBtn');
+            const backToSubjectsBtn = document.getElementById('backToSubjects');
+            const searchInput = document.getElementById('searchSubject');
+            const addSubjectBtn = document.getElementById('addSubjectBtn');
+            const addTopicBtn = document.getElementById('addTopicBtn');
+            const emptyState = document.getElementById('emptyState');
+            
+            // Modal elements
+            const addSubjectModal = new bootstrap.Modal(document.getElementById('addSubjectModal'));
+            const addTopicModal = new bootstrap.Modal(document.getElementById('addTopicModal'));
+            const addFlashcardModal = new bootstrap.Modal(document.getElementById('addFlashcardModal'));
+            const subjectNameInput = document.getElementById('subjectName');
+            const topicNameInput = document.getElementById('topicName');
+            const topicIconSelect = document.getElementById('topicIcon');
+            const saveSubjectBtn = document.getElementById('saveSubjectBtn');
+            const saveTopicBtn = document.getElementById('saveTopicBtn');
+            const flashcardQuestionInput = document.getElementById('flashcardQuestion');
+            const flashcardAnswerInput = document.getElementById('flashcardAnswer');
+            const saveFlashcardBtn = document.getElementById('saveFlashcardBtn');
+            
+            // Confirmation dialog elements
+            const confirmationOverlay = document.getElementById('confirmationOverlay');
+            const confirmationMessage = document.getElementById('confirmationMessage');
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+            const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            
+            // Current state
+            let currentSubject = null;
+            let currentTopicIndex = 0;
+            let currentCardIndex = 0;
+            let flashcards = [];
+            let originalFlashcards = []; // Store original order
+            let subjectsData = {};
+            let deleteType = ''; // 'subject', 'topic', or 'flashcard'
+            let deleteId = null;
+            const STORAGE_KEY = 'flexcard_data_v2';
+            
+            // Load data from localStorage
+            function loadData() {
+                try {
+                    const savedData = localStorage.getItem(STORAGE_KEY);
+                    if (savedData) {
+                        subjectsData = JSON.parse(savedData);
+                        console.log('Dados carregados do localStorage');
+                    } else {
+                        subjectsData = {};
+                        console.log('Nenhum dado encontrado no localStorage, iniciando com dados vazios');
+                    }
+                } catch (error) {
+                    console.error('Erro ao carregar dados do localStorage:', error);
+                    subjectsData = {};
+                }
+                
+                // Update UI with loaded data
+                updateSubjectsList();
+            }
+            
+            // Save data to localStorage
+            function saveData() {
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(subjectsData));
+                    console.log('Dados salvos no localStorage');
+                } catch (error) {
+                    console.error('Erro ao salvar dados no localStorage:', error);
+                    alert('Erro ao salvar dados. Verifique se o localStorage está habilitado no seu navegador.');
+                }
+            }
+            
+            // Update subjects list in UI
+            function updateSubjectsList() {
+                // Clear current list
+                subjectList.innerHTML = '';
+                
+                // Add subjects from data
+                const subjectKeys = Object.keys(subjectsData);
+                if (subjectKeys.length > 0) {
+                    subjectKeys.forEach(subjectKey => {
+                        const subjectData = subjectsData[subjectKey];
+                        const topicCount = subjectData.topics ? subjectData.topics.length : 0;
+                        
+                        const newSubject = document.createElement('li');
+                        newSubject.className = 'subject-item';
+                        newSubject.setAttribute('data-subject', subjectKey);
+                        newSubject.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>${subjectData.title}</span>
+                                <span class="badge bg-secondary badge-status">${topicCount} tópicos</span>
+                            </div>
+                            <button class="delete-subject" data-subject="${subjectKey}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        `;
+                        
+                        // Add click event
+                        newSubject.addEventListener('click', function(e) {
+                            // Check if delete button was clicked
+                            if (e.target.closest('.delete-subject')) {
+                                e.stopPropagation();
+                                confirmDelete('subject', subjectKey);
+                                return;
+                            }
+                            
+                            const subjectItems = subjectList.querySelectorAll('.subject-item');
+                            subjectItems.forEach(i => i.classList.remove('active'));
+                            this.classList.add('active');
+                            currentSubject = subjectKey;
+                            showTopics(subjectKey);
+                        });
+                        
+                        // Add delete event
+                        const deleteBtn = newSubject.querySelector('.delete-subject');
+                        deleteBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            confirmDelete('subject', subjectKey);
+                        });
+                        
+                        subjectList.appendChild(newSubject);
+                    });
+                    
+                    // If there are subjects, make the first one active
+                    if (currentSubject === null && subjectKeys.length > 0) {
+                        const firstSubject = subjectList.querySelector('.subject-item');
+                        firstSubject.classList.add('active');
+                        currentSubject = firstSubject.getAttribute('data-subject');
+                        showTopics(currentSubject);
+                    }
+                }
+                
+                // Update empty state
+                checkEmptyState();
+            }
+            
+            // Check if there are any subjects
+            function checkEmptyState() {
+                const subjectItems = subjectList.querySelectorAll('.subject-item');
+                if (subjectItems.length === 0) {
+                    emptyState.style.display = 'block';
+                    searchInput.disabled = true;
+                } else {
+                    emptyState.style.display = 'none';
+                    searchInput.disabled = false;
+                }
+            }
+            
+            // Initialize app
+            loadData();
+            checkEmptyState();
+            
+            // Add subject button
+            addSubjectBtn.addEventListener('click', function() {
+                // Clear form
+                subjectNameInput.value = '';
+                
+                // Show modal
+                addSubjectModal.show();
+            });
+            
+            // Save subject
+            saveSubjectBtn.addEventListener('click', function() {
+                const subjectName = subjectNameInput.value.trim();
+                
+                if (!subjectName) {
+                    alert('Por favor, digite um nome para a matéria.');
+                    return;
+                }
+                
+                // Create subject key
+                const subjectKey = subjectName.toLowerCase().replace(/\s+/g, '');
+                
+                // Check if subject already exists
+                if (subjectsData[subjectKey]) {
+                    alert('Esta matéria já existe!');
+                    return;
+                }
+                
+                // Add to subjects data
+                subjectsData[subjectKey] = {
+                    title: subjectName,
+                    color: 'primary',
+                    topics: []
+                };
+                
+                // Create new subject item
+                const newSubject = document.createElement('li');
+                newSubject.className = 'subject-item';
+                newSubject.setAttribute('data-subject', subjectKey);
+                newSubject.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>${subjectName}</span>
+                        <span class="badge bg-secondary badge-status">0 tópicos</span>
+                    </div>
+                    <button class="delete-subject" data-subject="${subjectKey}">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                `;
+                
+                // Add click event
+                newSubject.addEventListener('click', function(e) {
+                    // Check if delete button was clicked
+                    if (e.target.closest('.delete-subject')) {
+                        e.stopPropagation();
+                        confirmDelete('subject', subjectKey);
+                        return;
+                    }
+                    
+                    const subjectItems = subjectList.querySelectorAll('.subject-item');
+                    subjectItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    currentSubject = subjectKey;
+                    showTopics(subjectKey);
+                });
+                
+                // Add delete event
+                const deleteBtn = newSubject.querySelector('.delete-subject');
+                deleteBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    confirmDelete('subject', subjectKey);
+                });
+                
+                subjectList.appendChild(newSubject);
+                
+                // Make it active
+                const subjectItems = subjectList.querySelectorAll('.subject-item');
+                subjectItems.forEach(i => i.classList.remove('active'));
+                newSubject.classList.add('active');
+                currentSubject = subjectKey;
+                showTopics(currentSubject);
+                
+                // Hide modal
+                addSubjectModal.hide();
+                
+                // Save data
+                saveData();
+            });
+            
+            // Show topics for selected subject
+            function showTopics(subjectKey) {
+                const subjectData = subjectsData[subjectKey];
+                subjectTitleSpan.textContent = subjectData.title;
+                topicsHeaderTitle.innerHTML = `Tópicos de <span id="subjectTitle">${subjectData.title}</span>`;
+                
+                // Clear previous topics
+                topicsList.innerHTML = '';
+                
+                // Add topics
+                if (subjectData.topics && subjectData.topics.length > 0) {
+                    subjectData.topics.forEach((topic, index) => {
+                        const topicItem = document.createElement('div');
+                        topicItem.className = 'topic-item';
+                        topicItem.setAttribute('data-index', index);
+                        const cardCount = topic.cards ? topic.cards.length : 0;
+                        topicItem.innerHTML = `
+                            <div class="topic-title">
+                                <i class="fas fa-${topic.icon} topic-icon"></i>
+                                ${topic.title}
+                            </div>
+                            <div class="text-muted mt-1">${cardCount} flashcards</div>
+                            <button class="delete-topic" data-index="${index}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        `;
+                        
+                        topicItem.addEventListener('click', function(e) {
+                            // Check if delete button was clicked
+                            if (e.target.closest('.delete-topic')) {
+                                e.stopPropagation();
+                                confirmDelete('topic', index);
+                                return;
+                            }
+                            
+                            currentTopicIndex = parseInt(this.getAttribute('data-index'));
+                            showFlashcards(subjectKey, currentTopicIndex);
+                        });
+                        
+                        // Add delete event
+                        const deleteBtn = topicItem.querySelector('.delete-topic');
+                        deleteBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            confirmDelete('topic', index);
+                        });
+                        
+                        topicsList.appendChild(topicItem);
+                    });
+                } else {
+                    const emptyMessage = document.createElement('div');
+                    emptyMessage.className = 'text-center text-muted py-3';
+                    emptyMessage.textContent = 'Nenhum tópico criado ainda. Clique no botão abaixo para adicionar um novo tópico.';
+                    topicsList.appendChild(emptyMessage);
+                }
+                
+                // Show topics container and hide flashcard container
+                topicsContainer.style.display = 'block';
+                flashcardContainer.style.display = 'none';
+            }
+            
+            // Fisher-Yates shuffle algorithm
+            function shuffleArray(array) {
+                const newArray = [...array];
+                for (let i = newArray.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+                }
+                return newArray;
+            }
+            
+            // Show flashcards for selected topic with random order
+            function showFlashcards(subjectKey, topicIndex) {
+                const subjectData = subjectsData[subjectKey];
+                const topic = subjectData.topics[topicIndex];
+                
+                // Set flashcard data
+                originalFlashcards = topic.cards || [];
+                flashcards = shuffleArray(originalFlashcards); // Always start with shuffled cards
+                currentCardIndex = 0;
+                
+                // Update flashcard display
+                flashcardSubject.textContent = subjectData.title;
+                flashcardTopic.textContent = topic.title;
+                
+                if (flashcards.length > 0) {
+                    questionText.textContent = flashcards[currentCardIndex].question;
+                    answerText.textContent = flashcards[currentCardIndex].answer;
+                } else {
+                    questionText.textContent = 'Nenhuma pergunta adicionada ainda.';
+                    answerText.textContent = 'Adicione seu primeiro flashcard para começar a estudar.';
+                }
+                
+                // Update navigation buttons
+                updateNavButtons();
+                
+                // Reset flip card
+                flipCard.style.transform = 'rotateY(0deg)';
+                
+                // Show flashcard container and hide topics container
+                flashcardContainer.style.display = 'block';
+                topicsContainer.style.display = 'none';
+            }
+            
+            // Update navigation buttons state
+            function updateNavButtons() {
+                prevCardBtn.disabled = currentCardIndex === 0;
+                nextCardBtn.disabled = !flashcards || currentCardIndex === flashcards.length - 1;
+            }
+            
+            // Previous flashcard
+            prevCardBtn.addEventListener('click', function() {
+                if (currentCardIndex > 0) {
+                    currentCardIndex--;
+                    if (flashcards && flashcards[currentCardIndex]) {
+                        questionText.textContent = flashcards[currentCardIndex].question;
+                        answerText.textContent = flashcards[currentCardIndex].answer;
+                    }
+                    updateNavButtons();
+                    
+                    // Reset flip card
+                    flipCard.style.transform = 'rotateY(0deg)';
+                }
+            });
+            
+            // Next flashcard
+            nextCardBtn.addEventListener('click', function() {
+                if (flashcards && currentCardIndex < flashcards.length - 1) {
+                    currentCardIndex++;
+                    if (flashcards[currentCardIndex]) {
+                        questionText.textContent = flashcards[currentCardIndex].question;
+                        answerText.textContent = flashcards[currentCardIndex].answer;
+                    }
+                    updateNavButtons();
+                    
+                    // Reset flip card
+                    flipCard.style.transform = 'rotateY(0deg)';
+                }
+            });
+            
+            // Shuffle flashcards
+            shuffleCardsBtn.addEventListener('click', function() {
+                if (!currentSubject || flashcards.length === 0) {
+                    alert('Adicione flashcards antes de embaralhar.');
+                    return;
+                }
+                
+                // Always shuffle the original cards
+                flashcards = shuffleArray(originalFlashcards);
+                currentCardIndex = 0;
+                
+                // Update display
+                questionText.textContent = flashcards[currentCardIndex].question;
+                answerText.textContent = flashcards[currentCardIndex].answer;
+                updateNavButtons();
+                
+                // Reset flip card
+                flipCard.style.transform = 'rotateY(0deg)';
+                
+                alert('Flashcards embaralhados com sucesso! Comece do primeiro card.');
+            });
+            
+            // Sync data button
+            syncDataBtn.addEventListener('click', function() {
+                try {
+                    // Just save current data (it's already in localStorage)
+                    saveData();
+                    alert('Dados sincronizados com sucesso!');
+                } catch (error) {
+                    alert('Erro ao sincronizar dados: ' + error.message);
+                }
+            });
+            
+            // Flip card on click
+            flipCard.addEventListener('click', function(e) {
+                // Don't flip if delete button was clicked
+                if (e.target.closest('.delete-flashcard')) {
+                    return;
+                }
+                
+                if (this.style.transform === 'rotateY(180deg)') {
+                    this.style.transform = 'rotateY(0deg)';
+                } else {
+                    this.style.transform = 'rotateY(180deg)';
+                }
+            });
+            
+            // Delete flashcard button
+            deleteFlashcardBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (!currentSubject || !subjectsData[currentSubject].topics[currentTopicIndex].cards || 
+                    subjectsData[currentSubject].topics[currentTopicIndex].cards.length === 0) {
+                    return;
+                }
+                
+                confirmDelete('flashcard', currentCardIndex);
+            });
+            
+            // Back to subjects
+            backToSubjectsBtn.addEventListener('click', function() {
+                flashcardContainer.style.display = 'none';
+                topicsContainer.style.display = 'block';
+            });
+            
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const subjectItems = subjectList.querySelectorAll('.subject-item');
+                subjectItems.forEach(item => {
+                    const subjectText = item.textContent.toLowerCase();
+                    if (subjectText.includes(searchTerm)) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Add topic button
+            addTopicBtn.addEventListener('click', function() {
+                // Check if we have a current subject
+                if (!currentSubject) {
+                    alert('Por favor, selecione uma matéria primeiro.');
+                    return;
+                }
+                
+                // Clear form
+                topicNameInput.value = '';
+                topicIconSelect.selectedIndex = 0;
+                
+                // Show modal
+                addTopicModal.show();
+            });
+            
+            // Save topic
+            saveTopicBtn.addEventListener('click', function() {
+                const topicName = topicNameInput.value.trim();
+                const topicIcon = topicIconSelect.value;
+                
+                if (!topicName) {
+                    alert('Por favor, digite um nome para o tópico.');
+                    return;
+                }
+                
+                // Add topic to current subject
+                if (!subjectsData[currentSubject].topics) {
+                    subjectsData[currentSubject].topics = [];
+                }
+                
+                subjectsData[currentSubject].topics.push({
+                    title: topicName,
+                    icon: topicIcon,
+                    cards: []
+                });
+                
+                // Update subject badge
+                const subjectItem = document.querySelector(`.subject-item[data-subject="${currentSubject}"]`);
+                if (subjectItem) {
+                    const badge = subjectItem.querySelector('.badge-status');
+                    const topicCount = subjectsData[currentSubject].topics.length;
+                    badge.textContent = `${topicCount} tópicos`;
+                }
+                
+                // Hide modal
+                addTopicModal.hide();
+                
+                // Refresh topics list
+                showTopics(currentSubject);
+                
+                // Save data
+                saveData();
+            });
+            
+            // Add flashcard button
+            addFlashcardBtn.addEventListener('click', function() {
+                // Check if we have a current subject and topic
+                if (!currentSubject) {
+                    alert('Por favor, selecione uma matéria e um tópico primeiro.');
+                    return;
+                }
+                
+                // Clear form
+                flashcardQuestionInput.value = '';
+                flashcardAnswerInput.value = '';
+                
+                // Show modal
+                addFlashcardModal.show();
+            });
+            
+            // Save flashcard
+            saveFlashcardBtn.addEventListener('click', function() {
+                const question = flashcardQuestionInput.value.trim();
+                const answer = flashcardAnswerInput.value.trim();
+                
+                if (!question || !answer) {
+                    alert('Por favor, preencha tanto a pergunta quanto a resposta.');
+                    return;
+                }
+                
+                // Add flashcard to current topic
+                const subjectData = subjectsData[currentSubject];
+                const topic = subjectData.topics[currentTopicIndex];
+                
+                if (!topic.cards) {
+                    topic.cards = [];
+                }
+                
+                topic.cards.push({
+                    question: question,
+                    answer: answer
+                });
+                
+                // Update topic badge
+                const topicItem = topicsList.querySelector(`.topic-item[data-index="${currentTopicIndex}"] .text-muted`);
+                if (topicItem) {
+                    const cardCount = topic.cards.length;
+                    topicItem.textContent = `${cardCount} flashcards`;
+                }
+                
+                // Hide modal
+                addFlashcardModal.hide();
+                
+                // Refresh flashcards (will be shuffled)
+                showFlashcards(currentSubject, currentTopicIndex);
+                
+                // Save data
+                saveData();
+            });
+            
+            // Confirmation dialog functions
+            function confirmDelete(type, id) {
+                deleteType = type;
+                deleteId = id;
+                
+                switch (type) {
+                    case 'subject':
+                        const subjectTitle = subjectsData[id].title;
+                        confirmationMessage.textContent = `Tem certeza que deseja excluir a matéria "${subjectTitle}"? Todos os tópicos e flashcards serão perdidos. Esta ação não pode ser desfeita.`;
+                        break;
+                    case 'topic':
+                        const topicTitle = subjectsData[currentSubject].topics[id].title;
+                        confirmationMessage.textContent = `Tem certeza que deseja excluir o tópico "${topicTitle}"? Todos os flashcards deste tópico serão perdidos. Esta ação não pode ser desfeita.`;
+                        break;
+                    case 'flashcard':
+                        const flashcardQuestion = subjectsData[currentSubject].topics[currentTopicIndex].cards[id].question;
+                        confirmationMessage.textContent = `Tem certeza que deseja excluir o flashcard "${flashcardQuestion}"? Esta ação não pode ser desfeita.`;
+                        break;
+                }
+                
+                confirmationOverlay.style.display = 'flex';
+            }
+            
+            // Close confirmation dialog
+            function closeConfirmation() {
+                confirmationOverlay.style.display = 'none';
+                deleteType = '';
+                deleteId = null;
+            }
+            
+            // Event listeners for confirmation dialog
+            cancelDeleteBtn.addEventListener('click', closeConfirmation);
+            confirmCancelBtn.addEventListener('click', closeConfirmation);
+            
+            confirmDeleteBtn.addEventListener('click', function() {
+                if (deleteType === 'subject') {
+                    // Delete subject
+                    delete subjectsData[deleteId];
+                    
+                    // Update UI
+                    const subjectItem = document.querySelector(`.subject-item[data-subject="${deleteId}"]`);
+                    if (subjectItem) {
+                        subjectItem.remove();
+                    }
+                    
+                    // Reset current subject if it was deleted
+                    if (currentSubject === deleteId) {
+                        currentSubject = null;
+                        flashcardContainer.style.display = 'none';
+                        topicsContainer.style.display = 'none';
+                    }
+                    
+                    // Update empty state
+                    checkEmptyState();
+                }
+                else if (deleteType === 'topic') {
+                    // Delete topic
+                    subjectsData[currentSubject].topics.splice(deleteId, 1);
+                    
+                    // Update subject badge
+                    const subjectItem = document.querySelector(`.subject-item[data-subject="${currentSubject}"]`);
+                    if (subjectItem) {
+                        const badge = subjectItem.querySelector('.badge-status');
+                        const topicCount = subjectsData[currentSubject].topics.length;
+                        badge.textContent = `${topicCount} tópicos`;
+                    }
+                    
+                    // Refresh topics list
+                    showTopics(currentSubject);
+                }
+                else if (deleteType === 'flashcard') {
+                    // Delete flashcard
+                    subjectsData[currentSubject].topics[currentTopicIndex].cards.splice(deleteId, 1);
+                    
+                    // Update topic badge
+                    const topicItem = topicsList.querySelector(`.topic-item[data-index="${currentTopicIndex}"] .text-muted`);
+                    if (topicItem) {
+                        const cardCount = subjectsData[currentSubject].topics[currentTopicIndex].cards.length;
+                        topicItem.textContent = `${cardCount} flashcards`;
+                    }
+                    
+                    // Refresh flashcards
+                    showFlashcards(currentSubject, currentTopicIndex);
+                }
+                
+                // Save data
+                saveData();
+                
+                // Close confirmation
+                closeConfirmation();
+            });
+            
+            // Handle page visibility changes to ensure data is saved
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'hidden') {
+                    saveData();
+                }
+            });
+            
+            // Handle before unload
+            window.addEventListener('beforeunload', function() {
+                saveData();
+            });
+        });
+    </script>
+</body>
+</html>
