@@ -125,6 +125,10 @@
             display: none;
             margin-bottom: 2rem;
         }
+
+        .topico{
+            margin-right: 30px;
+        }
         
         .topics-header {
             background: white;
@@ -687,6 +691,9 @@
                         <button class="btn btn-outline-primary mt-2" id="addFlashcardBtn">
                             <i class="fas fa-plus"></i> Adicionar Flashcard
                         </button>
+                        <button type="button" id="delete-button" class="btn btn-outline-danger mt-2">
+                            <i class="fa-solid fa-minus"></i> Deletar
+                        </button>
                     </div>
                 </div>
             </div>
@@ -803,7 +810,7 @@
             const prevCardBtn = document.getElementById('prevCard');
             const nextCardBtn = document.getElementById('nextCard');
             const addFlashcardBtn = document.getElementById('addFlashcardBtn');
-            const deleteFlashcardBtn = document.getElementById('deleteFlashcardBtn');
+            const deleteFlashcardBtn = document.getElementById('delete-button');
             const shuffleCardsBtn = document.getElementById('shuffleCardsBtn');
             const syncDataBtn = document.getElementById('syncDataBtn');
             const backToSubjectsBtn = document.getElementById('backToSubjects');
@@ -892,7 +899,7 @@
                         newSubject.innerHTML = `
                             <div class="d-flex justify-content-between align-items-center">
                                 <span>${subjectData.title}</span>
-                                <span class="badge bg-secondary badge-status">${topicCount} tópicos</span>
+                                <span class="topico badge bg-secondary badge-status">${topicCount} tópicos</span>
                             </div>
                             <button class="delete-subject" data-subject="${subjectKey}">
                                 <i class="fas fa-trash-alt"></i>
@@ -995,7 +1002,7 @@
                 newSubject.innerHTML = `
                     <div class="d-flex justify-content-between align-items-center">
                         <span>${subjectName}</span>
-                        <span class="badge bg-secondary badge-status">0 tópicos</span>
+                        <span class="topico badge bg-secondary badge-status">0 tópicos</span>
                     </div>
                     <button class="delete-subject" data-subject="${subjectKey}">
                         <i class="fas fa-trash-alt"></i>
